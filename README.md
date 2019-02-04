@@ -23,6 +23,13 @@ GO111MODULE=on
 $ SLACK_TOKEN=xxxxxx go run main.go
 ```
 
-### Packages
+## Packages
 
 * [nlopes/slack](https://github.com/nlopes/slack)
+
+## Docker
+
+```bash
+$ docker build -t jnst/slack-bot .
+$ docker run -it --rm jnst-slack-bot
+```
