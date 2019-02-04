@@ -33,3 +33,16 @@ $ SLACK_TOKEN=xxxxxx go run main.go
 $ docker build -t jnst/slack-bot .
 $ docker run -it --rm jnst-slack-bot
 ```
+
+## Deploy on Heroku
+
+```bash
+$ heroku login
+$ heroku create
+$ heroku git:remote -a xxx-xxx-00001
+$ heroku config:set SLACK_TOKEN=xxxxx
+$ heroku config:set PORT=3000
+$ heroku container:login
+$ heroku container:push web
+$ heroku container:release web
+```

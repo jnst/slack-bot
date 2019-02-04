@@ -6,18 +6,24 @@ import (
 	"fmt"
 	"github.com/nlopes/slack"
 	"github.com/nlopes/slack/slackevents"
+	"log"
 	"net/http"
 	"os"
 )
 
 var token = os.Getenv("SLACK_TOKEN")
+var port = os.Getenv("PORT")
 var api = slack.New(token)
 
 func main() {
-	http.HandleFunc("/event", func(w http.ResponseWriter, r *http.Request) {
+	log.Printf("ENV: token=%v, port=%v\n", token, port)
+
+	http.HandleFunc("/events", func(w http.ResponseWriter, r *http.Request) {
 		buf := new(bytes.Buffer)
 		buf.ReadFrom(r.Body)
 		body := buf.String()
+		log.Printf("%v %v %v\n", r.Method, r.RequestURI, body)
+
 		eventsAPIEvent, e := slackevents.ParseEvent(json.RawMessage(body), slackevents.OptionVerifyToken(&slackevents.TokenComparator{VerificationToken: token}))
 		if e != nil {
 			w.WriteHeader(http.StatusInternalServerError)
@@ -39,7 +45,14 @@ func main() {
 				api.PostMessage(ev.Channel, slack.MsgOptionText("Yes, hello.", false))
 			}
 		}
+
+		res, err := json.Marshal("error")
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		w.Write(res)
 	})
-	fmt.Println("[INFO] Server listening")
-	http.ListenAndServe(":3000", nil)
+	fmt.Printf("[INFO] Server listening on port %v\n", port)
+	http.ListenAndServe(":" + port, nil)
 }

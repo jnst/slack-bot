@@ -10,11 +10,11 @@ RUN go mod download
 COPY ./ ./
 RUN CGO_ENABLED=0 go build \
     -installsuffix 'static' \
-    -o /app .
+    -o /bot .
 
-FROM scratch AS final
-COPY --from=builder /app /app
+FROM alpine:3.8 AS final
+COPY --from=builder /bot /usr/local/bin/bot
 
 EXPOSE 3000
 
-CMD ["/app"]
+CMD ["bot"]
