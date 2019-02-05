@@ -10,28 +10,31 @@ $ go version
 go version go1.11.5 darwin/amd64
 ```
 
-## Modules (vgo)
+### Modules (vgo)
 
 ```bash
 $ env | grep GO111MODULE
 GO111MODULE=on
 ```
 
+>In my case, I want to manage all the source code in GOPATH, so this is necessary.
+
+
+### Packages
+
+* [nlopes/slack](https://github.com/nlopes/slack)
+
 ## Run
 
 ```bash
-$ SLACK_TOKEN=xxxxxx go run main.go
+$ SLACK_TOKEN=xxxxx PORT=3000 go run main.go
 ```
-
-## Packages
-
-* [nlopes/slack](https://github.com/nlopes/slack)
 
 ## Docker
 
 ```bash
 $ docker build -t jnst/slack-bot .
-$ docker run -it --rm jnst-slack-bot
+$ docker run -it --rm -e SLACK_TOKEN=xxxxx -e PORT=3000 jnst/slack-bot
 ```
 
 ## Deploy on Heroku
