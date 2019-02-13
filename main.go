@@ -18,6 +18,18 @@ var api = slack.New(token)
 func main() {
 	log.Printf("ENV: token=%v, port=%v\n", token, port)
 
+	go handleEventsApi()
+
+	api := slack.New(token)
+	rtm := api.NewRTM()
+	go rtm.ManageConnection()
+
+	for msg := range rtm.IncomingEvents {
+		fmt.Printf("Event Received: %v\n", msg)
+	}
+}
+
+func handleEventsApi() {
 	http.HandleFunc("/events", func(w http.ResponseWriter, r *http.Request) {
 		buf := new(bytes.Buffer)
 		buf.ReadFrom(r.Body)
@@ -53,6 +65,7 @@ func main() {
 		}
 		w.Write(res)
 	})
+
 	fmt.Printf("[INFO] Server listening on port %v\n", port)
-	http.ListenAndServe(":" + port, nil)
+	log.Fatal(http.ListenAndServe(":" + port, nil))
 }
