@@ -1,6 +1,6 @@
 FROM golang:1.11-alpine3.8 as builder
 
-RUN apk add --no-cache ca-certificates git
+RUN apk add --no-cache git
 
 WORKDIR /src
 
@@ -12,7 +12,8 @@ RUN CGO_ENABLED=0 go build \
     -installsuffix 'static' \
     -o /bot .
 
-FROM alpine:3.8 AS final
+FROM alpine:3.8
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=builder /bot /usr/local/bin/bot
 
 EXPOSE 3000
