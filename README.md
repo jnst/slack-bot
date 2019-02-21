@@ -1,6 +1,6 @@
 # slack-bot
 
-🤖 Slack api bot using golang
+🤖 Slack api bot by golang
 
 ## Golang
 
@@ -20,8 +20,9 @@ GO111MODULE=on
 >In my case, I want to manage all the source code in GOPATH, so this is necessary.
 
 
-### Packages
+### Dependencies
 
+* [shomali11/slacker](https://github.com/shomali11/slacker)
 * [nlopes/slack](https://github.com/nlopes/slack)
 
 ## Run

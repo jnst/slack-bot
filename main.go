@@ -2,10 +2,12 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/nlopes/slack"
 	"github.com/nlopes/slack/slackevents"
+	"github.com/shomali11/slacker"
 	"log"
 	"net/http"
 	"os"
@@ -16,20 +18,38 @@ var port = os.Getenv("PORT")
 var api = slack.New(token)
 
 func main() {
-	log.Printf("ENV: token=%v, port=%v\n", token, port)
+	log.Printf("ENV: token=%#v, port=%v\n", token, port)
 
-	go handleEventsApi()
+	bot := slacker.NewClient(token)
+	AssignDefault(bot)
+	AssignPing(bot)
+	AssignEcho(bot)
+	AssignRepeat(bot)
+	AssignTest(bot)
+	AssignTime(bot)
+	AssignUpload(bot)
+	AssignProcess(bot)
 
-	api := slack.New(token)
-	rtm := api.NewRTM()
-	go rtm.ManageConnection()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
-	for msg := range rtm.IncomingEvents {
-		fmt.Printf("Event Received: %v\n", msg)
+	err := bot.Listen(ctx)
+	if err != nil {
+		log.Fatal(err)
 	}
+
+	//go startEventsApi()
+	//
+	//api := slack.New(token)
+	//rtm := api.NewRTM()
+	//go rtm.ManageConnection()
+	//
+	//for msg := range rtm.IncomingEvents {
+	//	fmt.Printf("Event Received: %v\n", msg)
+	//}
 }
 
-func handleEventsApi() {
+func startEventsApi() {
 	http.HandleFunc("/events", func(w http.ResponseWriter, r *http.Request) {
 		buf := new(bytes.Buffer)
 		buf.ReadFrom(r.Body)
@@ -54,7 +74,7 @@ func handleEventsApi() {
 			innerEvent := eventsAPIEvent.InnerEvent
 			switch ev := innerEvent.Data.(type) {
 			case *slackevents.AppMentionEvent:
-				api.PostMessage(ev.Channel, slack.MsgOptionText("Yes, hello.", false))
+				log.Fatal(api.PostMessage(ev.Channel, slack.MsgOptionText("Yes, hello.", false)))
 			}
 		}
 
@@ -67,5 +87,5 @@ func handleEventsApi() {
 	})
 
 	fmt.Printf("[INFO] Server listening on port %v\n", port)
-	log.Fatal(http.ListenAndServe(":" + port, nil))
+	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
